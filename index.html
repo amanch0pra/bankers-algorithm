@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banker's Algorithm Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="bankers.js"></script>
+    <script src="main.js" defer></script>
+</head>
+<body>
+    <div id="background">
+        <div class="blob magenta-blob"></div>
+        <div class="blob cyan-blob"></div>
+    </div>
+
+    <header class="glass-header">
+        <h1>BANKER'S ALGORITHM <span class="neon-text">NEXUS</span></h1>
+        <p>Advanced Operating System Deadlock Avoidance Simulator</p>
+    </header>
+
+    <main class="container">
+        <!-- SCREEN 1: Setup dimensions -->
+        <section id="screen-setup" class="panel glass-panel active">
+            <h2>System Configuration</h2>
+            
+            <div class="mode-selector">
+                <p class="selector-title">Execution Mode:</p>
+                <div class="mode-tabs">
+                    <input type="radio" id="mode-auto" name="sim-mode" value="auto" checked>
+                    <label for="mode-auto" class="mode-tab">Automatic</label>
+
+                    <input type="radio" id="mode-manual" name="sim-mode" value="manual">
+                    <label for="mode-manual" class="mode-tab">Manual (Step-by-Step)</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="numProcesses">Number of Processes:</label>
+                <input type="number" id="numProcesses" min="1" max="10" value="5">
+            </div>
+            <div class="input-group">
+                <label for="numResources">Number of Resources (Types):</label>
+                <input type="number" id="numResources" min="1" max="10" value="3">
+            </div>
+            <button id="btn-next-matrix" class="neon-btn">Initialize System Matrices</button>
+        </section>
+
+        <!-- SCREEN 2: Input Matrices -->
+        <section id="screen-matrix" class="panel glass-panel">
+            <h2>Resource Matrices Data</h2>
+            
+            <div class="matrix-container">
+                <div class="matrix-box">
+                    <h3>Allocation Matrix</h3>
+                    <div id="allocation-inputs" class="grid-inputs"></div>
+                </div>
+                <div class="matrix-box">
+                    <h3>Max Matrix</h3>
+                    <div id="max-inputs" class="grid-inputs"></div>
+                </div>
+            </div>
+
+            <div class="matrix-box available-box">
+                <h3>Initial Available Resources</h3>
+                <div id="available-inputs" class="flex-inputs"></div>
+            </div>
+
+             <div class="actions">
+                <button id="btn-back-setup" class="ghost-btn">Back</button>
+                <button id="btn-run-simulation" class="neon-btn accent">Run Simulation</button>
+                <button id="btn-fill-dummy-safe" class="ghost-btn outline">Safe Example</button>
+                <button id="btn-fill-dummy-unsafe" class="ghost-btn outline danger">Deadlock Example</button>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: Interactive Visualizer -->
+        <section id="screen-visualizer" class="panel glass-panel">
+            <div class="header-split">
+                <h2>Simulation Execution</h2>
+                <div class="action-buttons" style="display: flex; gap: 1rem;">
+                    <button id="btn-next-step" class="neon-btn accent" style="display: none;">Next Step &#10142;</button>
+                    <button id="btn-view-flowchart" class="neon-btn success" style="display: none;">View Detailed Flowchart</button>
+                    <button id="btn-restart" class="ghost-btn outline">Restart</button>
+                </div>
+            </div>
+
+            <div id="status-indicator" class="status-box">Status: Integrating data...</div>
+            
+            <div id="detailed-explanation-box" class="glass-box explanation-box" style="display: none; border-left: 4px solid var(--magenta); margin-bottom: 1rem;">
+                <h3 style="margin-bottom: 0.5rem; color: var(--magenta);">Simulation Logic Reasoner</h3>
+                <div id="explanation-content" class="explanation-text" style="line-height: 1.6;">Selecting mode...</div>
+            </div>
+
+            <div id="safe-sequence-dashboard" class="glass-box sequence-box" style="display: none;">
+                <h3>Executed Sequence Path</h3>
+                <div id="safe-sequence-chain" class="sequence-chain"></div>
+            </div>
+
+            <div class="visualizer-grid">
+                <div class="available-dashboard glass-box">
+                    <h3>Current Available Resources</h3>
+                    <div id="current-available-display" class="resource-meters"></div>
+                </div>
+
+                <div class="processes-dashboard glass-box">
+                    <div class="split">
+                        <h3>Process Queue Chart</h3>
+                        <div class="chart-legend">
+                            <span class="leg-alloc"></span> Allocated
+                            <span class="leg-need"></span> Needed
+                        </div>
+                    </div>
+                    <div id="process-list" class="process-list"></div>
+                </div>
+            </div>
+            
+            <div class="log-dashboard glass-box">
+                <h3>System Logs</h3>
+                <div id="system-logs" class="terminal-logs"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal-overlay">
+        <div class="modal-content glass-panel error-glow">
+            <h3 class="neon-text-error">⚠ SYSTEM ALERT</h3>
+            <p id="error-message">Invalid input detected.</p>
+            <button id="btn-close-error" class="neon-btn error-btn">ACKNOWLEDGE</button>
+        </div>
+    </div>
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content glass-panel success-glow">
+            <h2 class="neon-text-success">SYSTEM IS IN A SAFE STATE</h2>
+            <div id="final-sequence-chart" class="final-sequence">
+                <!-- Chart injected here -->
+            </div>
+            <button id="btn-close-success" class="neon-btn outline ghost-btn" style="margin-top: 2.5rem;">VIEW DASHBOARD</button>
+        </div>
+    </div>
+    <!-- Deadlock Modal -->
+    <div id="deadlock-modal" class="modal-overlay">
+        <div class="modal-content glass-panel deadlock-glow">
+            <div class="deadly-symbol">☣</div>
+            <h2 class="neon-text-error glitch" data-text="SYSTEM DEADLOCK DETECTED">SYSTEM DEADLOCK DETECTED</h2>
+            <p class="deadlock-msg">Critical state reached. No safe sequence exists.</p>
+            <button id="btn-close-deadlock" class="neon-btn error-btn outline" style="margin-top: 2rem;">ABORT PROTOCOL</button>
+        </div>
+    </div>
+    
+    <!-- Flowchart Modal -->
+    <div id="flowchart-modal" class="modal-overlay" style="align-items: flex-start; padding-top: 5vh; overflow-y: auto;">
+        <div class="modal-content glass-panel" style="max-width: 900px; width: 90%; background: #0a0b10e6; border: 1px solid var(--glass-border); text-align: left; padding: 2rem 3rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">
+                <h2 style="color: var(--cyan); margin: 0;">Complete Audit Flowchart</h2>
+                <button id="btn-close-flowchart" class="ghost-btn outline" style="padding: 5px 15px;">Close View</button>
+            </div>
+            <div id="flowchart-container" class="flowchart-layout"></div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button id="btn-flowchart-bottom-close" class="neon-btn">Return to Dashboard</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
